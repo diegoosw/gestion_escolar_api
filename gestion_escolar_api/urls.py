@@ -4,6 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from .views.bootstrap import VersionView
 from gestion_escolar_api.views import users
+from gestion_escolar_api.views import maestros
 
 urlpatterns = [
     #Agregamos las endpoints de usuarios
@@ -11,8 +12,12 @@ urlpatterns = [
         path('admin/', users.AdminView.as_view()),
     #Lista de administradores
         path('lista-admins/', users.AdminAll.as_view()),
+    #Maestros
+        path('maestros/', maestros.MaestrosView.as_view()),
     #Edit Admin
         #path('admins-edit/', users.AdminsViewEdit.as_view())
+
+    
 ]
 
 if settings.DEBUG:
