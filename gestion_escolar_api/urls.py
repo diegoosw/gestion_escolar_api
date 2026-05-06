@@ -3,7 +3,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from .views.bootstrap import VersionView
-from gestion_escolar_api.views import users
+from gestion_escolar_api.views import users, auth
 from gestion_escolar_api.views import maestros
 from gestion_escolar_api.views import alumnos
 
@@ -19,6 +19,10 @@ urlpatterns = [
         path('alumnos/', alumnos.AlumnosView.as_view()),
     #Edit Admin
         #path('admins-edit/', users.AdminsViewEdit.as_view())
+    #Login
+        path('login/', auth.CustomAuthToken.as_view()),
+    #Logout
+        path('logout/', auth.Logout.as_view())
 
     
 ]
