@@ -9,17 +9,19 @@ from rest_framework import generics
 from rest_framework import status
 from rest_framework.response import Response
 from django.contrib.auth.models import Group
+from django.shortcuts import get_object_or_404
 import json
-from django.db.models import *
 
 
 
 class AlumnosAll(generics.CreateAPIView):
+    #Obtener todos los alumnos
+    # Necesita permisos de autenticación de usuario para poder acceder a la petición
     permission_classes = (permissions.IsAuthenticated,)
     def get(self, request, *args, **kwargs):
-        user = request.user
-        #TODO: Regresar perfil del usuario
-        return Response({})
+        alumnos = Alumnos.objects.filter(user__is_active=1).order_by("id")
+        lista = AlumnosSerializer(alumnos, many=True).data
+        return Response(lista, 200)
 
 class AlumnosView(generics.CreateAPIView):
     # Permisos por método (sobrescribe el comportamiento default)
@@ -29,13 +31,11 @@ class AlumnosView(generics.CreateAPIView):
             return [permissions.IsAuthenticated()]
         return []  # POST no requiere autenticación
     
-    #Registrar nuevo usuario administrador
+    #Registrar nuevo usuario
     @transaction.atomic
     def post(self, request, *args, **kwargs):
-        
-        # Serializamos los datos del administrador para volverlo de nuevo JSON
+
         user = UserSerializer(data=request.data)
-        
         if user.is_valid():
             #Grab user data
             role = request.data['rol']
@@ -43,12 +43,11 @@ class AlumnosView(generics.CreateAPIView):
             last_name = request.data['last_name']
             email = request.data['email']
             password = request.data['password']
-
             #Valida si existe el usuario o bien el email registrado
             existing_user = User.objects.filter(email=email).first()
 
             if existing_user:
-                return Response({"message":"Nombre de usuario "+email+", ya existe"},400)
+                return Response({"message":"Username "+email+", is already taken"},400)
 
             user = User.objects.create( username = email,
                                         email = email,
@@ -58,26 +57,26 @@ class AlumnosView(generics.CreateAPIView):
 
 
             user.save()
-            #Cifrar la contraseña
             user.set_password(password)
             user.save()
 
-            #Asignar el rol al usuario a la tabla de grupos
             group, created = Group.objects.get_or_create(name=role)
             group.user_set.add(user)
             user.save()
 
-            #Almacenar los datos adicionales del administrador en la tabla de administradores
+            #Create a profile for the user
             alumno = Alumnos.objects.create(user=user,
                                             matricula= request.data["matricula"],
-                                            curp= request.data["curp"],
+                                            curp= request.data["curp"].upper(),
                                             rfc= request.data["rfc"].upper(),
-                                            fecha_nacimiento = request.data.get("fecha_nacimiento"),
-                                            telefono= request.data["telefono"],
+                                            fecha_nacimiento= request.data["fecha_nacimiento"],
                                             edad= request.data["edad"],
-                                            ocupacion= request.data["ocupacion"],)
+                                            telefono= request.data["telefono"],
+                                            ocupacion= request.data["ocupacion"])
             alumno.save()
 
-            return Response({"Alumno creado ID": alumno.id }, 201)
+            return Response({"Alumno creado con ID= ": alumno.id }, 201)
 
         return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
