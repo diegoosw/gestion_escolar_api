@@ -31,6 +31,14 @@ class AlumnosView(generics.CreateAPIView):
             return [permissions.IsAuthenticated()]
         return []  # POST no requiere autenticación
     
+    #Obtener un alumno específico por su ID
+    def get(self, request, *args, **kwargs):
+        alumno = Alumnos.objects.filter(id=request.GET.get("id"), user__is_active=1).first()
+        if not alumno:
+            return Response({"message": "Alumno no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+        serializer = AlumnosSerializer(alumno)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
     #Registrar nuevo usuario
     @transaction.atomic
     def post(self, request, *args, **kwargs):
@@ -78,5 +86,40 @@ class AlumnosView(generics.CreateAPIView):
             return Response({"Alumno creado con ID= ": alumno.id }, 201)
 
         return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    #Función para eliminar un alumno específico por su ID
+    def delete(self, request, *args, **kwargs):
+        alumno = get_object_or_404(Alumnos, id=request.GET.get("id"))
+        try:
+            alumno.user.delete()
+            return Response({"details":"Alumno eliminado"},200)
+        except Exception as e:
+            return Response({"details":"Error al eliminar alumno"},400)
+        
+    # Actualizar datos del alumno
+    @transaction.atomic
+    def put(self, request, *args, **kwargs):
+        alumno = Alumnos.objects.filter(id=request.data["id"], user__is_active=1).first()
+        if not alumno:
+            return Response({"message": "Alumno no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+
+        user = alumno.user
+        # Actualizar campos del usuario
+        user.first_name = request.data["first_name"]
+        user.last_name = request.data["last_name"]
+        #Guardamos los cambios del usuario no es necesario actualizar la contraseña
+        user.save()
+
+        # Actualizar campos del alumno
+        alumno.matricula = request.data["matricula"]
+        alumno.curp = request.data["curp"].upper()
+        alumno.rfc = request.data["rfc"].upper()
+        alumno.fecha_nacimiento = request.data["fecha_nacimiento"]
+        alumno.edad = request.data["edad"]
+        alumno.telefono = request.data["telefono"]
+        alumno.ocupacion = request.data["ocupacion"]
+        alumno.save()
+
+        return Response({"message": "Alumno actualizado correctamente"}, status=status.HTTP_200_OK)
 
 

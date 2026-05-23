@@ -10,6 +10,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from django.contrib.auth.models import Group
 import json
+from django.shortcuts import get_object_or_404
 
 class MaestrosAll(generics.CreateAPIView):
     #Obtener todos los maestros
@@ -33,6 +34,9 @@ class MaestrosView(generics.CreateAPIView):
         if self.request.method in ['GET', 'PUT', 'DELETE']:
             return [permissions.IsAuthenticated()]
         return []  # POST no requiere autenticación
+    
+    #Función para obtener un maestro específico por su ID
+    #TODO: Agregar validación para verificar que el maestro exista y obtenerlo
     
     #Registrar nuevo usuario maestro
     @transaction.atomic
@@ -71,3 +75,15 @@ class MaestrosView(generics.CreateAPIView):
             maestro.save()
             return Response({"Maestro creado con ID= ": maestro.id }, 201)
         return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    #Función para actualizar un maestro específico por su ID
+    #TODO: Agregar validación para verificar que el maestro exista y actualizarlo
+
+    #Función para eliminar un maestro específico por su ID
+    def delete(self, request, *args, **kwargs):
+        maestro = get_object_or_404(Maestros, id=request.GET.get("id"))
+        try:
+            maestro.user.delete()
+            return Response({"details":"Maestro eliminado"},200)
+        except Exception as e:
+            return Response({"details":"Error al eliminar maestro"},400)
