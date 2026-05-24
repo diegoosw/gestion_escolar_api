@@ -36,7 +36,13 @@ class MaestrosView(generics.CreateAPIView):
         return []  # POST no requiere autenticación
     
     #Función para obtener un maestro específico por su ID
-    #TODO: Agregar validación para verificar que el maestro exista y obtenerlo
+    #Obtener un maestro específico por su ID
+    def get(self, request, *args, **kwargs):
+        maestro = Maestros.objects.filter(id=request.GET.get("id"), user__is_active=1).first()
+        if not maestro:
+            return Response({"message": "Maestro no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+        serializer = MaestrosSerializer(maestro)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
     #Registrar nuevo usuario maestro
     @transaction.atomic
@@ -77,7 +83,31 @@ class MaestrosView(generics.CreateAPIView):
         return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)
     
     #Función para actualizar un maestro específico por su ID
-    #TODO: Agregar validación para verificar que el maestro exista y actualizarlo
+    # Actualizar datos del maestro
+    @transaction.atomic
+    def put(self, request, *args, **kwargs):
+        maestro = Maestros.objects.filter(id=request.data["id"], user__is_active=1).first()
+        if not maestro:
+            return Response({"message": "Maestro no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+
+        user = maestro.user
+        # Actualizar campos del usuario
+        user.first_name = request.data["first_name"]
+        user.last_name = request.data["last_name"]
+        #Guardamos los cambios del usuario no es necesario actualizar la contraseña
+        user.save()
+
+        # Actualizar campos del maestro
+        maestro.id_trabajador = request.data["id_trabajador"]
+        maestro.fecha_nacimiento = request.data["fecha_nacimiento"]
+        maestro.telefono = request.data["telefono"]
+        maestro.rfc = request.data["rfc"].upper()
+        maestro.cubiculo = request.data["cubiculo"]
+        maestro.area_investigacion = request.data["area_investigacion"]
+        maestro.materias_array = json.dumps(request.data["materias_array"])
+        maestro.save()
+
+        return Response({"message": "Maestro actualizado correctamente"}, status=status.HTTP_200_OK)
 
     #Función para eliminar un maestro específico por su ID
     def delete(self, request, *args, **kwargs):
