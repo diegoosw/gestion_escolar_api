@@ -79,7 +79,9 @@ class AdminView(generics.CreateAPIView):
                                             telefono= request.data["telefono"],
                                             rfc= request.data["rfc"].upper(),
                                             edad= request.data["edad"],
-                                            ocupacion= request.data["ocupacion"])
+                                            ocupacion= request.data["ocupacion"],
+                                            categoria= request.data["categoria"],
+                                            grado_academico= request.data["grado_academico"])
             admin.save()
 
             return Response({"Administrador creado ID": admin.id }, 201)
@@ -106,6 +108,8 @@ class AdminView(generics.CreateAPIView):
         admin.rfc = request.data["rfc"].upper()
         admin.edad = request.data["edad"]
         admin.ocupacion = request.data["ocupacion"]
+        admin.categoria = request.data["categoria"]
+        admin.grado_academico = request.data["grado_academico"]
         admin.save()
 
         return Response({"message": "Administrador actualizado correctamente"}, status=status.HTTP_200_OK)

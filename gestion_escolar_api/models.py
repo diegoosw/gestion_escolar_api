@@ -22,6 +22,8 @@ class Administradores(models.Model):
     rfc = models.CharField(max_length=255,null=True, blank=True)
     edad = models.IntegerField(null=True, blank=True)
     ocupacion = models.CharField(max_length=255,null=True, blank=True)
+    categoria = models.CharField(max_length=255,null=True, blank=True)
+    grado_academico = models.CharField(max_length=255,null=True, blank=True)
     creation = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update = models.DateTimeField(null=True, blank=True)
 
@@ -45,10 +47,8 @@ class Maestros(models.Model):
     def __str__(self):
         return "Perfil del maestro "+self.user.first_name+" "+self.user.last_name
     
-# TODO: Agregar modelo de alumnos
-# class Alumnos(models.Model):
 
-# En gestion_escolar_api/models.py
+
 
 class Alumnos(models.Model):
     id = models.BigAutoField(primary_key=True)
