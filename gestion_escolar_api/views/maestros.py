@@ -77,6 +77,8 @@ class MaestrosView(generics.CreateAPIView):
                                             rfc= request.data["rfc"].upper(),
                                             cubiculo= request.data["cubiculo"],
                                             area_investigacion= request.data["area_investigacion"],
+                                            campus= request.data["campus"],
+                                            sueldo_estimado= request.data.get("sueldo_estimado", 0.00),
                                             materias_array = json.dumps(request.data["materias_array"]))
             maestro.save()
             return Response({"Maestro creado con ID= ": maestro.id }, 201)
@@ -105,6 +107,8 @@ class MaestrosView(generics.CreateAPIView):
         maestro.cubiculo = request.data["cubiculo"]
         maestro.area_investigacion = request.data["area_investigacion"]
         maestro.materias_array = json.dumps(request.data["materias_array"])
+        maestro.campus = request.data["campus"]
+        maestro.sueldo_estimado = request.data.get("sueldo_estimado", maestro.sueldo_estimado)
         maestro.save()
 
         return Response({"message": "Maestro actualizado correctamente"}, status=status.HTTP_200_OK)

@@ -41,6 +41,8 @@ class Maestros(models.Model):
     edad = models.IntegerField(null=True, blank=True)
     area_investigacion = models.CharField(max_length=255,null=True, blank=True)
     materias_array = models.TextField(null=True, blank=True)
+    campus = models.CharField(max_length=255,null=True, blank=True)
+    sueldo_estimado = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, null=True, blank=True)
     creation = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update = models.DateTimeField(null=True, blank=True)
 
