@@ -62,6 +62,8 @@ class Alumnos(models.Model):
     edad = models.IntegerField(null=True, blank=True)
     telefono = models.CharField(max_length=255, null=True, blank=True)
     ocupacion = models.CharField(max_length=255, null=True, blank=True)
+    direccion = models.CharField(max_length=255, null=True, blank=True)
+    sexo = models.CharField(max_length=255, null=True, blank=True)
     creation = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update = models.DateTimeField(null=True, blank=True)
 

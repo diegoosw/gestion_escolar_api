@@ -19,6 +19,8 @@ urlpatterns = [
         path('alumnos/', alumnos.AlumnosView.as_view()),
     #Lista de alumnos
         path('lista-alumnos/', alumnos.AlumnosAll.as_view()),
+    #Total usuarios
+        path('total-usuarios/', users.TotalUsuarios.as_view()),
     #Edit Admin
         #path('admins-edit/', users.AdminsViewEdit.as_view())
     #Login
